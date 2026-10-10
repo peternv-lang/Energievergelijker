@@ -38,6 +38,7 @@ class Tarieven:
     drempel_besparing_per_jaar: float
     max_leeftijd_tarieven_dagen: int
     huidig: str
+    batterij_kwh: float = 0.0
     dynamisch: list[Dynamisch] = field(default_factory=list)
     vast: list[Vast] = field(default_factory=list)
 
@@ -60,6 +61,7 @@ def laad(pad: Path) -> Tarieven:
         drempel_besparing_per_jaar=alg.get("drempel_besparing_per_jaar", 50.0),
         max_leeftijd_tarieven_dagen=alg.get("max_leeftijd_tarieven_dagen", 60),
         huidig=cfg["huidig"]["naam"],
+        batterij_kwh=alg.get("batterij_kwh", 0.0),
         dynamisch=[Dynamisch(**d) for d in cfg.get("dynamisch", [])],
         vast=[Vast(**v) for v in cfg.get("vast", [])],
     )

@@ -88,7 +88,7 @@ def markdown(a: Analyse) -> str:
             f"| {i} | {naam} | {x.soort} | {euro(x.kosten_maand)} | {euro(x.kosten_jaar)} | {voordeel} |"
         )
     r.append("")
-    if a.resultaten[0].kosten_jaar_zonder_saldering is not None:
+    if a.scenario_2027:
         r.extend(scenario_2027(a))
     bonussen = [x for x in a.resultaten if x.welkomstbonus]
     if bonussen:
@@ -149,12 +149,29 @@ def zonnepanelen(a: Analyse) -> list[str]:
 
 
 def scenario_2027(a: Analyse) -> list[str]:
-    r = ["### Scenario vanaf 2027 (zonder salderingsregeling)\n"]
-    r.append("| Leverancier | Kosten per jaar | Voordeel t.o.v. huidig |")
+    sc = a.scenario_2027
+    r = ["### Scenario vanaf 2027 (zonder saldering, met thuisbatterij)\n"]
+    r.append(
+        "Zonder saldering bepalen alleen je afname en teruglevering het verschil tussen dynamische "
+        "leveranciers. Hoe die uitvallen hangt af van hoe je batterij dan stuurt:\n"
+    )
+    r.append("| | Afname | Teruglevering |")
     r.append("|---|---:|---:|")
-    for x in sorted(a.resultaten, key=lambda x: x.kosten_jaar_zonder_saldering):
-        naam = f"**{x.naam}** (huidig)" if x.huidig else x.naam
-        voordeel = "—" if x.huidig else euro(x.verschil_jaar_zonder_saldering)
-        r.append(f"| {naam} | {euro(x.kosten_jaar_zonder_saldering)} | {voordeel} |")
+    r.append(f"| Huidig patroon (batterij handelt zoals nu) | {kwh(sc.afname_huidig)} | {kwh(sc.terug_huidig)} |")
+    r.append(f"| Dagbalans (batterij verschuift eigen opwek) | {kwh(sc.afname_balans)} | {kwh(sc.terug_balans)} |")
     r.append("")
+    r.append("| Leverancier | Voordeel bij huidig patroon | Voordeel bij dagbalans |")
+    r.append("|---|---:|---:|")
+    for naam in sorted(sc.voordeel_balans, key=lambda n: -sc.voordeel_balans[n]):
+        huidig = naam == a.huidig.naam
+        r.append(
+            f"| {'**' + naam + '** (huidig)' if huidig else naam} | "
+            f"{'—' if huidig else euro(sc.voordeel_huidig[naam])} | "
+            f"{'—' if huidig else euro(sc.voordeel_balans[naam])} |"
+        )
+    r.append("")
+    r.append(
+        f"Gebaseerd op {sc.dagen} dagen. De werkelijkheid ligt tussen beide kolommen; zonnebonus en "
+        "opbrengst van onbalanshandel (bijv. Frank Energie Slim Handelen) zijn niet meegerekend.\n"
+    )
     return r

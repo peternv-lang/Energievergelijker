@@ -34,7 +34,11 @@ def genereer(eind=datetime(2026, 10, 1, tzinfo=TZ), seed=1):
     for m in per_maand.values():
         m["to"] = m["from"]
         maanden.append(m)
-    return {"id": "demo", "appNickname": "Demo", "maand": {"nodes": maanden},
+    dagen = {}
+    for u in uren:
+        dagen[u["from"][:10]] = dagen.get(u["from"][:10], 0) + u["consumption"]
+    dag = [{"from": d + "T00:00:00+02:00", "consumption": v} for d, v in dagen.items()]
+    return {"id": "demo", "appNickname": "Demo", "maand": {"nodes": maanden}, "dag": {"nodes": dag},
             "uur": {"nodes": uren[-1500:]}, "productie": {"nodes": []}}
 
 

@@ -91,11 +91,8 @@ class TestVergelijk(unittest.TestCase):
         self.assertEqual(len(a.zon), 12)
         self.assertAlmostEqual(a.zon[0].eigen_verbruik, 50)
         self.assertAlmostEqual(a.zon[0].totaal_verbruik, 300)
-        vast = next(r for r in a.resultaten if r.naam == "Vast")
-        self.assertAlmostEqual(vast.kosten_jaar_zonder_saldering, 12 * (250 * 0.30 + 7.0), places=6)
         md = rapport.markdown(a)
         self.assertIn("Zonnepanelen (SolarEdge)", md)
-        self.assertIn("Scenario vanaf 2027", md)
 
     def test_teruglevering_en_zonnebonus(self):
         t = tarieven_basis()
@@ -107,6 +104,21 @@ class TestVergelijk(unittest.TestCase):
         zon = next(r for r in a.resultaten if r.naam == "Zon")
         # per maand: 100 x 0,02 vergoeding + 10% x (10 + 2) bonus = 3,20
         self.assertAlmostEqual(zon.verschil_jaar, 12 * 3.20, places=6)
+
+    def test_scenario_2027_batterij(self):
+        from energievergelijker.tibber import Dag
+        from energievergelijker.vergelijk import scenario_2027
+        t = tarieven_basis(batterij_kwh=15.0)
+        t.dynamisch[1].terugleverkosten_per_kwh = -0.02
+        # zomerdag: 10 af, 30 terug; winterdag: 25 af, 5 terug
+        dagen = [Dag(date(2026, 1, 1), 10, 30), Dag(date(2026, 1, 2), 25, 5)] * 20
+        sc = scenario_2027(dagen, t)
+        self.assertAlmostEqual(sc.afname_huidig, 35 / 2 * 365)
+        self.assertAlmostEqual(sc.afname_balans, 20 / 2 * 365)
+        self.assertAlmostEqual(sc.terug_balans, 20 / 2 * 365)
+        verwacht = sc.afname_balans * 0.008 + sc.terug_balans * 0.02 + 12 * 2.0
+        self.assertAlmostEqual(sc.voordeel_balans["Goedkoop"], verwacht)
+        self.assertIsNone(scenario_2027(dagen, tarieven_basis()))  # geen batterij
 
     def test_solaredge_parse(self):
         p = solaredge.parse({"energy": {"unit": "Wh", "values": [

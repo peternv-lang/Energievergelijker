@@ -11,11 +11,11 @@ Uitgangspunten (alle bedragen incl. btw):
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from datetime import date, datetime
 
 from .tarieven import Dynamisch, Tarieven, Vast
-from .tibber import Periode, TibberData, Uur
+from .tibber import Dag, Periode, TibberData, Uur
 
 STANDAARD_DALFRACTIE = 0.45
 
@@ -30,8 +30,6 @@ class Resultaat:
     welkomstbonus: float = 0.0
     bron: str = ""
     huidig: bool = False
-    kosten_jaar_zonder_saldering: float | None = None
-    verschil_jaar_zonder_saldering: float | None = None
 
 
 @dataclass
@@ -53,6 +51,27 @@ class Analyse:
     tarieven_verouderd: bool
     tarieven_leeftijd_dagen: int
     zon: list[ZonMaand] = field(default_factory=list)
+    scenario_2027: Scenario2027 | None = None
+
+
+@dataclass
+class Scenario2027:
+    """Na einde saldering, alleen dynamische contracten (vast is daar kansloos).
+
+    Twee grenzen voor afname/teruglevering per jaar:
+    - huidig patroon: batterij blijft handelen zoals nu (bovengrens volumes);
+    - dagbalans: batterij verschuift zoveel mogelijk eigen opwek binnen de dag, dus per dag
+      alleen het netto-tekort wordt afgenomen of het netto-overschot teruggeleverd (ondergrens).
+    De werkelijkheid ligt daartussen. Zonnebonus is niet meegerekend.
+    """
+
+    dagen: int
+    afname_huidig: float
+    terug_huidig: float
+    afname_balans: float
+    terug_balans: float
+    voordeel_huidig: dict[str, float]
+    voordeel_balans: dict[str, float]
 
 
 @dataclass
@@ -112,6 +131,36 @@ def _vast(v: Vast, maanden: list[Periode], dal: float, t: Tarieven) -> float:
     return energie + prod * v.terugleverkosten_per_kwh + len(maanden) * v.vaste_kosten_per_maand
 
 
+def _voordeel(d: Dynamisch, ref: Dynamisch, afname: float, terug: float) -> float:
+    """Jaarlijks voordeel van `d` t.o.v. `ref` (positief = goedkoper), excl. zonnebonus."""
+    return (
+        afname * (ref.inkoopvergoeding_per_kwh - d.inkoopvergoeding_per_kwh)
+        + terug * (ref.terugleverkosten_per_kwh - d.terugleverkosten_per_kwh)
+        + 12 * (ref.vaste_kosten_per_maand - d.vaste_kosten_per_maand)
+    )
+
+
+def scenario_2027(dagen: list[Dag], t: Tarieven) -> Scenario2027 | None:
+    if len(dagen) < 28 or not t.batterij_kwh:
+        return None
+    schaal = 365 / len(dagen)
+    afname = sum(d.afname for d in dagen) * schaal
+    terug = sum(d.teruglevering for d in dagen) * schaal
+    netto = [d.afname - d.teruglevering for d in dagen]
+    afname_b = sum(max(n, 0.0) for n in netto) * schaal
+    terug_b = sum(max(-n, 0.0) for n in netto) * schaal
+    ref = t.huidig_contract
+    return Scenario2027(
+        dagen=len(dagen),
+        afname_huidig=afname,
+        terug_huidig=terug,
+        afname_balans=afname_b,
+        terug_balans=terug_b,
+        voordeel_huidig={d.naam: _voordeel(d, ref, afname, terug) for d in t.dynamisch},
+        voordeel_balans={d.naam: _voordeel(d, ref, afname_b, terug_b) for d in t.dynamisch},
+    )
+
+
 def analyseer(
     data: TibberData, t: Tarieven, vandaag: date, opwek: dict[str, float] | None = None
 ) -> Analyse:
@@ -153,14 +202,6 @@ def analyseer(
     for r in resultaten:
         r.verschil_jaar = huidig.kosten_jaar - r.kosten_jaar
 
-    # Scenario vanaf 2027: geen salderingsregeling meer.
-    if t.saldering and any(m.teruglevering_kwh for m in volledig):
-        t2 = replace(t, saldering=False)
-        per_naam = {d.naam: _dynamisch(d, ref, volledig, t2) * schaal for d in t.dynamisch}
-        per_naam |= {v.naam: _vast(v, volledig, dal, t2) * schaal for v in t.vast}
-        for r in resultaten:
-            r.kosten_jaar_zonder_saldering = per_naam[r.naam]
-            r.verschil_jaar_zonder_saldering = per_naam[huidig.naam] - per_naam[r.naam]
     resultaten.sort(key=lambda r: r.kosten_jaar)
     beste = resultaten[0]
 
@@ -185,6 +226,7 @@ def analyseer(
         melding=not beste.huidig and beste.verschil_jaar >= t.drempel_besparing_per_jaar,
         tarieven_verouderd=leeftijd > t.max_leeftijd_tarieven_dagen,
         tarieven_leeftijd_dagen=leeftijd,
+        scenario_2027=scenario_2027(data.dagen[-365:], t),
         zon=[
             ZonMaand(
                 maand=f"{m.start:%Y-%m}",

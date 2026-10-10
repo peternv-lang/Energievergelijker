@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 
 API_URL = "https://api.tibber.com/v1-beta/gql"
 
@@ -23,6 +23,12 @@ QUERY = """
       }
       productie: production(resolution: MONTHLY, last: 12) {
         nodes { from to profit production }
+      }
+      dag: consumption(resolution: DAILY, last: 366) {
+        nodes { from consumption }
+      }
+      dagproductie: production(resolution: DAILY, last: 366) {
+        nodes { from production }
       }
     }
   }
@@ -48,10 +54,18 @@ class Uur:
 
 
 @dataclass
+class Dag:
+    datum: date
+    afname: float
+    teruglevering: float
+
+
+@dataclass
 class TibberData:
     huis: str
     maanden: list[Periode] = field(default_factory=list)
     uren: list[Uur] = field(default_factory=list)
+    dagen: list[Dag] = field(default_factory=list)
 
 
 def _dt(waarde: str) -> datetime:
@@ -89,6 +103,15 @@ def parse(home: dict) -> TibberData:
                 opbrengst=p.get("profit") or 0.0,
             )
         )
+    dagprod = {
+        n["from"][:10]: n["production"]
+        for n in (home.get("dagproductie") or {}).get("nodes", [])
+        if n.get("production") is not None
+    }
+    for n in (home.get("dag") or {}).get("nodes", []):
+        if n.get("consumption") is not None:
+            d = n["from"][:10]
+            data.dagen.append(Dag(date.fromisoformat(d), n["consumption"], dagprod.get(d, 0.0)))
     for n in home["uur"]["nodes"]:
         if n.get("consumption") is None:
             continue
