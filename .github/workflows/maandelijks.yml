@@ -31,6 +31,8 @@ jobs:
         id: rapport
         env:
           TIBBER_TOKEN: ${{ secrets.TIBBER_TOKEN }}
+          SOLAREDGE_API_KEY: ${{ secrets.SOLAREDGE_API_KEY }}
+          SOLAREDGE_SITE_ID: ${{ secrets.SOLAREDGE_SITE_ID }}
         run: python -m energievergelijker
 
       - name: Rapport opslaan in repository

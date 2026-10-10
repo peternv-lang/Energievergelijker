@@ -10,7 +10,7 @@ from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 
-from . import rapport, tarieven, tibber
+from . import rapport, solaredge, tarieven, tibber
 from .vergelijk import analyseer
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -34,7 +34,15 @@ def main(argv: list[str] | None = None) -> int:
             return 2
         data = tibber.haal_op(token, args.huis)
 
-    a = analyseer(data, t, date.today())
+    opwek = None
+    if sleutel := os.environ.get("SOLAREDGE_API_KEY"):
+        van = min(m.start for m in data.maanden).date().replace(day=1)
+        try:
+            opwek = solaredge.haal_op(sleutel, os.environ.get("SOLAREDGE_SITE_ID") or None, van, date.today())
+        except Exception as fout:  # rapport gaat door zonder zonnedata
+            print(f"SolarEdge niet bereikbaar: {fout}", file=sys.stderr)
+
+    a = analyseer(data, t, date.today(), opwek)
     args.uit.mkdir(parents=True, exist_ok=True)
     naam = f"{a.maand:%Y-%m}"
     (args.uit / f"{naam}.md").write_text(rapport.markdown(a))

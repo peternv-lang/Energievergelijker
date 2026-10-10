@@ -11,7 +11,7 @@ Uitgangspunten (alle bedragen incl. btw):
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime
 
 from .tarieven import Dynamisch, Tarieven, Vast
@@ -30,6 +30,8 @@ class Resultaat:
     welkomstbonus: float = 0.0
     bron: str = ""
     huidig: bool = False
+    kosten_jaar_zonder_saldering: float | None = None
+    verschil_jaar_zonder_saldering: float | None = None
 
 
 @dataclass
@@ -50,6 +52,24 @@ class Analyse:
     melding: bool
     tarieven_verouderd: bool
     tarieven_leeftijd_dagen: int
+    zon: list[ZonMaand] = field(default_factory=list)
+
+
+@dataclass
+class ZonMaand:
+    maand: str  # "JJJJ-MM"
+    opwek: float  # kWh volgens SolarEdge
+    teruglevering: float  # kWh volgens Tibber
+    eigen_verbruik: float  # opwek die direct in huis is gebruikt
+    afname_net: float  # kWh volgens Tibber
+
+    @property
+    def zelfconsumptie(self) -> float:
+        return self.eigen_verbruik / self.opwek if self.opwek else 0.0
+
+    @property
+    def totaal_verbruik(self) -> float:
+        return self.afname_net + self.eigen_verbruik
 
 
 def is_dal(t: datetime) -> bool:
@@ -88,7 +108,9 @@ def _vast(v: Vast, maanden: list[Periode], dal: float, t: Tarieven) -> float:
     return energie + prod * v.terugleverkosten_per_kwh + len(maanden) * v.vaste_kosten_per_maand
 
 
-def analyseer(data: TibberData, t: Tarieven, vandaag: date) -> Analyse:
+def analyseer(
+    data: TibberData, t: Tarieven, vandaag: date, opwek: dict[str, float] | None = None
+) -> Analyse:
     begin_huidige_maand = date(vandaag.year, vandaag.month, 1)
     volledig = sorted(
         (m for m in data.maanden if m.start.date() < begin_huidige_maand), key=lambda m: m.start
@@ -126,6 +148,15 @@ def analyseer(data: TibberData, t: Tarieven, vandaag: date) -> Analyse:
     huidig = next(r for r in resultaten if r.huidig)
     for r in resultaten:
         r.verschil_jaar = huidig.kosten_jaar - r.kosten_jaar
+
+    # Scenario vanaf 2027: geen salderingsregeling meer.
+    if t.saldering and any(m.teruglevering_kwh for m in volledig):
+        t2 = replace(t, saldering=False)
+        per_naam = {d.naam: _dynamisch(d, ref, volledig, t2) * schaal for d in t.dynamisch}
+        per_naam |= {v.naam: _vast(v, volledig, dal, t2) * schaal for v in t.vast}
+        for r in resultaten:
+            r.kosten_jaar_zonder_saldering = per_naam[r.naam]
+            r.verschil_jaar_zonder_saldering = per_naam[huidig.naam] - per_naam[r.naam]
     resultaten.sort(key=lambda r: r.kosten_jaar)
     beste = resultaten[0]
 
@@ -150,4 +181,15 @@ def analyseer(data: TibberData, t: Tarieven, vandaag: date) -> Analyse:
         melding=not beste.huidig and beste.verschil_jaar >= t.drempel_besparing_per_jaar,
         tarieven_verouderd=leeftijd > t.max_leeftijd_tarieven_dagen,
         tarieven_leeftijd_dagen=leeftijd,
+        zon=[
+            ZonMaand(
+                maand=f"{m.start:%Y-%m}",
+                opwek=opwek[f"{m.start:%Y-%m}"],
+                teruglevering=m.teruglevering_kwh,
+                eigen_verbruik=max(opwek[f"{m.start:%Y-%m}"] - m.teruglevering_kwh, 0.0),
+                afname_net=m.kwh,
+            )
+            for m in volledig
+            if opwek and f"{m.start:%Y-%m}" in opwek
+        ],
     )

@@ -9,6 +9,8 @@ via de Tibber API, rekent dat door tegen andere dynamische en vaste contracten, 
 - Verbruik, kosten en gemiddelde kWh-prijs van de afgelopen maand
 - Of je slim verbruikt: jouw gewogen prijs vs. de gemiddelde uurprijs
 - Ranglijst van leveranciers op jaarkosten (laatste 12 maanden), met verwacht voordeel t.o.v. Tibber
+- Met SolarEdge: opwek, eigen verbruik, teruglevering en zelfconsumptie per maand
+- Scenario vanaf 2027 (einde salderingsregeling) per leverancier
 - Waarschuwing als de tarieventabel verouderd is
 
 Rapporten komen in `rapporten/JJJJ-MM.md` (+ `.json`).
@@ -18,8 +20,11 @@ Rapporten komen in `rapporten/JJJJ-MM.md` (+ `.json`).
 1. Maak een Tibber API-token aan op <https://developer.tibber.com/settings/access-token>.
 2. Zet het token in GitHub: *Settings → Secrets and variables → Actions → New repository secret*,
    naam `TIBBER_TOKEN`.
-3. Zorg dat je e-mailmeldingen voor issues in deze repository aan hebt (*Watch → Custom → Issues*).
-4. Start de eerste run handmatig: *Actions → Maandelijkse energievergelijking → Run workflow*.
+3. Optioneel, voor zonnepanelen: maak op <https://monitoring.solaredge.com> via *Admin → Site Access →
+   API Access* een API-sleutel aan en zet die als secret `SOLAREDGE_API_KEY`. `SOLAREDGE_SITE_ID` is
+   optioneel; zonder wordt je eerste installatie gebruikt.
+4. Zorg dat je e-mailmeldingen voor issues in deze repository aan hebt (*Watch → Custom → Issues*).
+5. Start de eerste run handmatig: *Actions → Maandelijkse energievergelijking → Run workflow*.
 
 Daarna draait hij automatisch op de 3e van elke maand.
 

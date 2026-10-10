@@ -69,6 +69,9 @@ def markdown(a: Analyse) -> str:
                 "uurprijs. Verschuif wassen, laden en verwarmen naar goedkope uren.\n"
             )
 
+    if a.zon:
+        r.extend(zonnepanelen(a))
+
     r.append("## Vergelijking leveranciers\n")
     r.append(
         f"Basis: {a.kwh_jaar:,.0f} kWh/jaar".replace(",", ".")
@@ -85,6 +88,8 @@ def markdown(a: Analyse) -> str:
             f"| {i} | {naam} | {x.soort} | {euro(x.kosten_maand)} | {euro(x.kosten_jaar)} | {voordeel} |"
         )
     r.append("")
+    if a.resultaten[0].kosten_jaar_zonder_saldering is not None:
+        r.extend(scenario_2027(a))
     bonussen = [x for x in a.resultaten if x.welkomstbonus]
     if bonussen:
         r.append("Eenmalige welkomstbonussen (niet in de jaarkosten verwerkt): "
@@ -108,3 +113,48 @@ def markdown(a: Analyse) -> str:
             r.append(f"- {x.naam}: {x.bron}")
     r.append("")
     return "\n".join(r)
+
+
+def kwh(x: float) -> str:
+    return f"{x:,.0f} kWh".replace(",", ".")
+
+
+def zonnepanelen(a: Analyse) -> list[str]:
+    opwek = sum(z.opwek for z in a.zon)
+    terug = sum(z.teruglevering for z in a.zon)
+    eigen = sum(z.eigen_verbruik for z in a.zon)
+    totaal = sum(z.totaal_verbruik for z in a.zon)
+    r = [f"## Zonnepanelen (SolarEdge) — laatste {len(a.zon)} maanden\n"]
+    r.append(
+        f"Opwek {kwh(opwek)}, waarvan {kwh(eigen)} direct zelf verbruikt "
+        f"(**zelfconsumptie {pct(eigen / opwek if opwek else 0)}**) en {kwh(terug)} teruggeleverd. "
+        f"Je panelen dekken {pct(eigen / totaal if totaal else 0)} van je totale stroomverbruik "
+        f"({kwh(totaal)}).\n"
+    )
+    r.append("| Maand | Opwek | Eigen verbruik | Teruglevering | Afname net | Zelfconsumptie |")
+    r.append("|---|---:|---:|---:|---:|---:|")
+    for z in a.zon:
+        jaar, mnd = z.maand.split("-")
+        r.append(
+            f"| {MAANDEN[int(mnd) - 1][:3]} {jaar} | {kwh(z.opwek)} | {kwh(z.eigen_verbruik)} | "
+            f"{kwh(z.teruglevering)} | {kwh(z.afname_net)} | {pct(z.zelfconsumptie)} |"
+        )
+    r.append("")
+    r.append(
+        "Vanaf 2027 (einde saldering) is elke kWh die je zelf verbruikt in plaats van teruglevert circa "
+        "€ 0,20–0,25 waard. Verschuif verbruik (wassen, laden, boiler) naar zonnige uren om de "
+        "zelfconsumptie te verhogen.\n"
+    )
+    return r
+
+
+def scenario_2027(a: Analyse) -> list[str]:
+    r = ["### Scenario vanaf 2027 (zonder salderingsregeling)\n"]
+    r.append("| Leverancier | Kosten per jaar | Voordeel t.o.v. huidig |")
+    r.append("|---|---:|---:|")
+    for x in sorted(a.resultaten, key=lambda x: x.kosten_jaar_zonder_saldering):
+        naam = f"**{x.naam}** (huidig)" if x.huidig else x.naam
+        voordeel = "—" if x.huidig else euro(x.verschil_jaar_zonder_saldering)
+        r.append(f"| {naam} | {euro(x.kosten_jaar_zonder_saldering)} | {voordeel} |")
+    r.append("")
+    return r

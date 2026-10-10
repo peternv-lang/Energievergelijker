@@ -2,7 +2,7 @@ import unittest
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from energievergelijker import rapport, tarieven, tibber
+from energievergelijker import rapport, solaredge, tarieven, tibber
 from energievergelijker.tarieven import Dynamisch, Tarieven, Vast
 from energievergelijker.tibber import Periode, TibberData
 from energievergelijker.vergelijk import analyseer, is_dal
@@ -83,6 +83,26 @@ class TestVergelijk(unittest.TestCase):
         md = rapport.markdown(a)
         self.assertIn("Energierapport september 2026", md)
         self.assertIn("Tibber", md)
+
+    def test_zonnepanelen_en_2027(self):
+        maanden = data(prod=100)
+        opwek = {f"{m.start:%Y-%m}": 150.0 for m in maanden.maanden}
+        a = analyseer(maanden, tarieven_basis(), date(2026, 10, 10), opwek)
+        self.assertEqual(len(a.zon), 12)
+        self.assertAlmostEqual(a.zon[0].eigen_verbruik, 50)
+        self.assertAlmostEqual(a.zon[0].totaal_verbruik, 300)
+        vast = next(r for r in a.resultaten if r.naam == "Vast")
+        self.assertAlmostEqual(vast.kosten_jaar_zonder_saldering, 12 * (250 * 0.30 + 7.0), places=6)
+        md = rapport.markdown(a)
+        self.assertIn("Zonnepanelen (SolarEdge)", md)
+        self.assertIn("Scenario vanaf 2027", md)
+
+    def test_solaredge_parse(self):
+        p = solaredge.parse({"energy": {"unit": "Wh", "values": [
+            {"date": "2026-09-01 00:00:00", "value": 512000.0},
+            {"date": "2026-10-01 00:00:00", "value": None},
+        ]}})
+        self.assertEqual(p, {"2026-09": 512.0})
 
 
 if __name__ == "__main__":
