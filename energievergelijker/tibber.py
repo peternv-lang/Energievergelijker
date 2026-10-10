@@ -24,12 +24,6 @@ QUERY = """
       productie: production(resolution: MONTHLY, last: 12) {
         nodes { from to profit production }
       }
-      dag: consumption(resolution: DAILY, last: 366) {
-        nodes { from consumption }
-      }
-      dagproductie: production(resolution: DAILY, last: 366) {
-        nodes { from production }
-      }
     }
   }
 }
@@ -72,17 +66,50 @@ def _dt(waarde: str) -> datetime:
     return datetime.fromisoformat(waarde)
 
 
-def haal_op(token: str, huis_index: int = 0) -> TibberData:
+# De API geeft per verzoek maximaal ~1 maand aan dagwaarden; daarom terugbladeren met `before`.
+DAG_QUERY = """
+query($id: ID!, $voor: String) {
+  viewer {
+    home(id: $id) {
+      %s(resolution: DAILY, last: 31, before: $voor) {
+        pageInfo { startCursor hasPreviousPage }
+        nodes { from %s }
+      }
+    }
+  }
+}
+"""
+
+
+def _vraag(token: str, query: str, variabelen: dict | None = None) -> dict:
     verzoek = urllib.request.Request(
         API_URL,
-        data=json.dumps({"query": QUERY}).encode(),
+        data=json.dumps({"query": query, "variables": variabelen or {}}).encode(),
         headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(verzoek, timeout=60) as antwoord:
         resultaat = json.load(antwoord)
     if resultaat.get("errors"):
         raise RuntimeError(f"Tibber API fout: {resultaat['errors']}")
-    return parse(resultaat["data"]["viewer"]["homes"][huis_index])
+    return resultaat["data"]
+
+
+def _dagen(token: str, huis_id: str, veld: str, waarde: str, max_paginas: int = 13) -> list[dict]:
+    nodes, voor = [], None
+    for _ in range(max_paginas):
+        verbinding = _vraag(token, DAG_QUERY % (veld, waarde), {"id": huis_id, "voor": voor})["viewer"]["home"][veld]
+        nodes = verbinding["nodes"] + nodes
+        if not verbinding["pageInfo"]["hasPreviousPage"] or not verbinding["nodes"]:
+            break
+        voor = verbinding["pageInfo"]["startCursor"]
+    return nodes
+
+
+def haal_op(token: str, huis_index: int = 0) -> TibberData:
+    home = _vraag(token, QUERY)["viewer"]["homes"][huis_index]
+    home["dag"] = {"nodes": _dagen(token, home["id"], "consumption", "consumption")}
+    home["dagproductie"] = {"nodes": _dagen(token, home["id"], "production", "production")}
+    return parse(home)
 
 
 def parse(home: dict) -> TibberData:

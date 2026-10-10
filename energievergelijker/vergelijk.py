@@ -226,7 +226,9 @@ def analyseer(
         melding=not beste.huidig and beste.verschil_jaar >= t.drempel_besparing_per_jaar,
         tarieven_verouderd=leeftijd > t.max_leeftijd_tarieven_dagen,
         tarieven_leeftijd_dagen=leeftijd,
-        scenario_2027=scenario_2027(data.dagen[-365:], t),
+        scenario_2027=scenario_2027(
+            sorted({d.datum: d for d in data.dagen if d.datum < vandaag}.values(), key=lambda d: d.datum)[-365:], t
+        ),
         zon=[
             ZonMaand(
                 maand=f"{m.start:%Y-%m}",
