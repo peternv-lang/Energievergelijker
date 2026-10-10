@@ -18,7 +18,9 @@
       "verschil_jaar": 239.81904079999998,
       "welkomstbonus": 0.0,
       "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-      "huidig": false
+      "huidig": false,
+      "kosten_jaar_zonder_saldering": 569.3663460728751,
+      "verschil_jaar_zonder_saldering": 239.81904079999993
     },
     {
       "naam": "Frank Energie",
@@ -28,7 +30,9 @@
       "verschil_jaar": 34.64619159999998,
       "welkomstbonus": 0.0,
       "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-      "huidig": false
+      "huidig": false,
+      "kosten_jaar_zonder_saldering": 774.5391952728751,
+      "verschil_jaar_zonder_saldering": 34.64619159999995
     },
     {
       "naam": "ANWB Energie",
@@ -38,7 +42,9 @@
       "verschil_jaar": 19.31941279999998,
       "welkomstbonus": 0.0,
       "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-      "huidig": false
+      "huidig": false,
+      "kosten_jaar_zonder_saldering": 789.865974072875,
+      "verschil_jaar_zonder_saldering": 19.31941280000001
     },
     {
       "naam": "Tibber",
@@ -48,7 +54,9 @@
       "verschil_jaar": 0.0,
       "welkomstbonus": 0.0,
       "bron": "tibber.com/nl/energiecontract (per 1-9-2026)",
-      "huidig": true
+      "huidig": true,
+      "kosten_jaar_zonder_saldering": 809.185386872875,
+      "verschil_jaar_zonder_saldering": 0.0
     },
     {
       "naam": "Budget Thuis 1 jaar vast",
@@ -58,7 +66,9 @@
       "verschil_jaar": -606.9043557271248,
       "welkomstbonus": 0.0,
       "bron": "keuze.nl / overstappen.nl, oktober 2026 \u2014 vaste kosten controleren",
-      "huidig": false
+      "huidig": false,
+      "kosten_jaar_zonder_saldering": 2479.53424,
+      "verschil_jaar_zonder_saldering": -1670.348853127125
     },
     {
       "naam": "Eneco 1 jaar vast",
@@ -68,7 +78,9 @@
       "verschil_jaar": -634.6016033071248,
       "welkomstbonus": 0.0,
       "bron": "keuze.nl, oktober 2026 \u2014 vaste kosten controleren",
-      "huidig": false
+      "huidig": false,
+      "kosten_jaar_zonder_saldering": 2559.3713757,
+      "verschil_jaar_zonder_saldering": -1750.1859888271251
     },
     {
       "naam": "Essent 1 jaar vast",
@@ -78,7 +90,9 @@
       "verschil_jaar": -649.9765797271248,
       "welkomstbonus": 0.0,
       "bron": "energievergelijk.nl, oktober 2026 \u2014 vaste kosten controleren",
-      "huidig": false
+      "huidig": false,
+      "kosten_jaar_zonder_saldering": 2610.6992,
+      "verschil_jaar_zonder_saldering": -1801.513813127125
     }
   ],
   "beste": {
@@ -89,7 +103,9 @@
     "verschil_jaar": 239.81904079999998,
     "welkomstbonus": 0.0,
     "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-    "huidig": false
+    "huidig": false,
+    "kosten_jaar_zonder_saldering": 569.3663460728751,
+    "verschil_jaar_zonder_saldering": 239.81904079999993
   },
   "huidig": {
     "naam": "Tibber",
@@ -99,9 +115,12 @@
     "verschil_jaar": 0.0,
     "welkomstbonus": 0.0,
     "bron": "tibber.com/nl/energiecontract (per 1-9-2026)",
-    "huidig": true
+    "huidig": true,
+    "kosten_jaar_zonder_saldering": 809.185386872875,
+    "verschil_jaar_zonder_saldering": 0.0
   },
   "melding": true,
   "tarieven_verouderd": false,
-  "tarieven_leeftijd_dagen": 0
+  "tarieven_leeftijd_dagen": 0,
+  "zon": []
 }
