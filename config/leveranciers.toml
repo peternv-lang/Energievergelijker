@@ -1,0 +1,85 @@
+# Tarieven van leveranciers — alle bedragen INCLUSIEF btw.
+#
+# Netbeheerkosten en de vermindering energiebelasting zijn bij elke leverancier
+# gelijk en tellen daarom niet mee in de vergelijking.
+#
+# Werk deze lijst periodiek bij (bijv. via leveranciers' tarievenbladen of een
+# vergelijkingssite). Het rapport waarschuwt als `peildatum` te oud is.
+
+[algemeen]
+peildatum = 2026-10-10
+energiebelasting_per_kwh = 0.11085   # 2026, eerste schijf, incl. btw
+saldering = true                     # salderingsregeling vervalt per 1-1-2027 -> dan false
+drempel_besparing_per_jaar = 50.0    # melding als een alternatief minstens zoveel per jaar scheelt
+max_leeftijd_tarieven_dagen = 60
+
+# Jouw huidige contract. Moet een dynamisch contract zijn met naam "Tibber".
+[huidig]
+naam = "Tibber"
+
+# --------------------------------------------------------------------------
+# Dynamische contracten: stroomprijs = EPEX-uurprijs + inkoopvergoeding.
+# De kale uurprijs is bij iedereen gelijk; alleen opslag en vaste kosten verschillen.
+# --------------------------------------------------------------------------
+[[dynamisch]]
+naam = "Tibber"
+inkoopvergoeding_per_kwh = 0.0180
+vaste_kosten_per_maand = 6.99
+terugleverkosten_per_kwh = 0.0248    # Tibber rekent sinds 1-1-2026 kosten bij teruglevering
+bron = "tibber.com/nl/energiecontract (per 1-9-2026)"
+
+[[dynamisch]]
+naam = "Zonneplan"
+inkoopvergoeding_per_kwh = 0.0200
+vaste_kosten_per_maand = 6.25
+terugleverkosten_per_kwh = -0.0200   # negatief = vergoeding (excl. zonnebonus)
+bron = "stroomvoorspeller.nl, gecheckt 29-9-2026"
+
+[[dynamisch]]
+naam = "Frank Energie"
+inkoopvergoeding_per_kwh = 0.0182
+vaste_kosten_per_maand = 7.00
+terugleverkosten_per_kwh = 0.0182
+bron = "stroomvoorspeller.nl, gecheckt 29-9-2026"
+
+[[dynamisch]]
+naam = "ANWB Energie"
+inkoopvergoeding_per_kwh = 0.0180
+vaste_kosten_per_maand = 8.50
+terugleverkosten_per_kwh = 0.0180
+bron = "stroomvoorspeller.nl, gecheckt 29-9-2026"
+
+# --------------------------------------------------------------------------
+# Vaste / variabele contracten: all-in kWh-prijs incl. energiebelasting en btw.
+# Gebruik tarief_dal = tarief_normaal voor een enkeltarief.
+# Dal = 23:00-07:00 op werkdagen + hele weekend.
+# --------------------------------------------------------------------------
+[[vast]]
+naam = "Budget Thuis 1 jaar vast"
+tarief_normaal = 0.304
+tarief_dal = 0.304
+vaste_kosten_per_maand = 7.50
+terugleverkosten_per_kwh = 0.0
+terugleververgoeding_per_kwh = 0.0   # alleen relevant zonder saldering
+welkomstbonus = 0.0
+bron = "keuze.nl / overstappen.nl, oktober 2026 — vaste kosten controleren"
+
+[[vast]]
+naam = "Eneco 1 jaar vast"
+tarief_normaal = 0.31347
+tarief_dal = 0.31347
+vaste_kosten_per_maand = 7.95
+terugleverkosten_per_kwh = 0.0
+terugleververgoeding_per_kwh = 0.0
+welkomstbonus = 0.0
+bron = "keuze.nl, oktober 2026 — vaste kosten controleren"
+
+[[vast]]
+naam = "Essent 1 jaar vast"
+tarief_normaal = 0.320
+tarief_dal = 0.320
+vaste_kosten_per_maand = 7.95
+terugleverkosten_per_kwh = 0.0
+terugleververgoeding_per_kwh = 0.0
+welkomstbonus = 0.0
+bron = "energievergelijk.nl, oktober 2026 — vaste kosten controleren"

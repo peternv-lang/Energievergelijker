@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+tests/demo_home.json
+.env
