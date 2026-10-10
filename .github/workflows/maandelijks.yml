@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "17 7 3 * *"   # elke 3e van de maand, 07:17 UTC (maanddata is dan compleet)
   workflow_dispatch:
+  push:                    # ook draaien na wijziging van code of tarieven
+    paths:
+      - "config/**"
+      - "energievergelijker/**"
+      - ".github/workflows/maandelijks.yml"
 
 permissions:
   contents: write
