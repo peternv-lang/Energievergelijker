@@ -3,11 +3,11 @@
   "kwh_maand": 613.733,
   "kosten_maand_tibber": -48.64102896962499,
   "gem_prijs_maand": 0.263364008378725,
-  "gem_marktprijs_maand": 0.328524629288499,
+  "gem_marktprijs_maand": 0.3287617324707031,
   "kwh_jaar": 7860.3099999999995,
   "teruglevering_jaar": 5505.796,
   "aantal_maanden": 12,
-  "dalfractie": 0.5185476434646973,
+  "dalfractie": 0.5202727093902731,
   "dalfractie_gemeten": true,
   "resultaten": [
     {
@@ -18,9 +18,7 @@
       "verschil_jaar": 290.8546983387825,
       "welkomstbonus": 0.0,
       "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-      "huidig": false,
-      "kosten_jaar_zonder_saldering": 369.78694773409256,
-      "verschil_jaar_zonder_saldering": 290.85469833878244
+      "huidig": false
     },
     {
       "naam": "Frank Energie",
@@ -30,9 +28,7 @@
       "verschil_jaar": 39.75804599999998,
       "welkomstbonus": 0.0,
       "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-      "huidig": false,
-      "kosten_jaar_zonder_saldering": 620.883600072875,
-      "verschil_jaar_zonder_saldering": 39.758046000000036
+      "huidig": false
     },
     {
       "naam": "ANWB Energie",
@@ -42,9 +38,7 @@
       "verschil_jaar": 23.330107999999996,
       "welkomstbonus": 0.0,
       "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-      "huidig": false,
-      "kosten_jaar_zonder_saldering": 637.311538072875,
-      "verschil_jaar_zonder_saldering": 23.330107999999996
+      "huidig": false
     },
     {
       "naam": "Tibber",
@@ -54,9 +48,7 @@
       "verschil_jaar": 0.0,
       "welkomstbonus": 0.0,
       "bron": "eigen Tibber-factuur september 2026",
-      "huidig": true,
-      "kosten_jaar_zonder_saldering": 660.641646072875,
-      "verschil_jaar_zonder_saldering": 0.0
+      "huidig": true
     },
     {
       "naam": "Budget Thuis 1 jaar vast",
@@ -66,9 +58,7 @@
       "verschil_jaar": -755.4480965271248,
       "welkomstbonus": 0.0,
       "bron": "keuze.nl / overstappen.nl, oktober 2026 \u2014 vaste kosten controleren",
-      "huidig": false,
-      "kosten_jaar_zonder_saldering": 2479.53424,
-      "verschil_jaar_zonder_saldering": -1818.8925939271248
+      "huidig": false
     },
     {
       "naam": "Eneco 1 jaar vast",
@@ -78,9 +68,7 @@
       "verschil_jaar": -783.1453441071249,
       "welkomstbonus": 0.0,
       "bron": "keuze.nl, oktober 2026 \u2014 vaste kosten controleren",
-      "huidig": false,
-      "kosten_jaar_zonder_saldering": 2559.3713757,
-      "verschil_jaar_zonder_saldering": -1898.729729627125
+      "huidig": false
     },
     {
       "naam": "Essent 1 jaar vast",
@@ -90,9 +78,7 @@
       "verschil_jaar": -798.5203205271248,
       "welkomstbonus": 0.0,
       "bron": "energievergelijk.nl, oktober 2026 \u2014 vaste kosten controleren",
-      "huidig": false,
-      "kosten_jaar_zonder_saldering": 2610.6992,
-      "verschil_jaar_zonder_saldering": -1950.057553927125
+      "huidig": false
     }
   ],
   "beste": {
@@ -103,9 +89,7 @@
     "verschil_jaar": 290.8546983387825,
     "welkomstbonus": 0.0,
     "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
-    "huidig": false,
-    "kosten_jaar_zonder_saldering": 369.78694773409256,
-    "verschil_jaar_zonder_saldering": 290.85469833878244
+    "huidig": false
   },
   "huidig": {
     "naam": "Tibber",
@@ -115,12 +99,29 @@
     "verschil_jaar": 0.0,
     "welkomstbonus": 0.0,
     "bron": "eigen Tibber-factuur september 2026",
-    "huidig": true,
-    "kosten_jaar_zonder_saldering": 660.641646072875,
-    "verschil_jaar_zonder_saldering": 0.0
+    "huidig": true
   },
   "melding": true,
   "tarieven_verouderd": false,
   "tarieven_leeftijd_dagen": 0,
-  "zon": []
+  "zon": [],
+  "scenario_2027": {
+    "dagen": 31,
+    "afname_huidig": 7957.2590322580645,
+    "terug_huidig": 5129.427419354838,
+    "afname_balans": 3528.6198387096774,
+    "terug_balans": 700.7882258064515,
+    "voordeel_huidig": {
+      "Tibber": 0.0,
+      "Zonneplan": 137.66339174193547,
+      "Frank Energie": 40.39790961290321,
+      "ANWB Energie": 23.989361419354843
+    },
+    "voordeel_balans": {
+      "Tibber": 0.0,
+      "Zonneplan": 27.833139741935483,
+      "Frank Energie": 11.168890935483866,
+      "ANWB Energie": -6.125385096774188
+    }
+  }
 }
