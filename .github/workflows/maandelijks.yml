@@ -47,9 +47,11 @@ jobs:
         if: steps.rapport.outputs.melding == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          TITEL: "💡 ${{ steps.rapport.outputs.titel }}"
         run: |
+          gh issue list --state open --limit 100 --json title -q '.[].title' | grep -Fxq "$TITEL" && exit 0
           gh issue create \
-            --title "💡 ${{ steps.rapport.outputs.titel }}" \
+            --title "$TITEL" \
             --body-file "${{ steps.rapport.outputs.rapport }}" \
             --assignee "${{ github.repository_owner }}"
 
@@ -57,8 +59,10 @@ jobs:
         if: steps.rapport.outputs.verouderd == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          TITEL: "⚠️ Leverancierstarieven bijwerken"
         run: |
+          gh issue list --state open --limit 100 --json title -q '.[].title' | grep -Fxq "$TITEL" && exit 0
           gh issue create \
-            --title "⚠️ Leverancierstarieven bijwerken" \
+            --title "$TITEL" \
             --body "De tarieven in config/leveranciers.toml zijn ouder dan de ingestelde limiet. Werk ze bij voor een betrouwbare vergelijking." \
             --assignee "${{ github.repository_owner }}"
