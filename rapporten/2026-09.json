@@ -106,22 +106,22 @@
   "tarieven_leeftijd_dagen": 0,
   "zon": [],
   "scenario_2027": {
-    "dagen": 31,
-    "afname_huidig": 7957.2590322580645,
-    "terug_huidig": 5129.427419354838,
-    "afname_balans": 3528.6198387096774,
-    "terug_balans": 700.7882258064515,
+    "dagen": 365,
+    "afname_huidig": 7857.441,
+    "terug_huidig": 5526.15,
+    "afname_balans": 4808.147,
+    "terug_balans": 2476.856,
     "voordeel_huidig": {
       "Tibber": 0.0,
-      "Zonneplan": 137.66339174193547,
-      "Frank Energie": 40.39790961290321,
-      "ANWB Energie": 23.989361419354843
+      "Zonneplan": 145.1187168,
+      "Frank Energie": 39.73911059999999,
+      "ANWB Energie": 23.310598800000008
     },
     "voordeel_balans": {
       "Tibber": 0.0,
-      "Zonneplan": 27.833139741935483,
-      "Frank Energie": 11.168890935483866,
-      "ANWB Energie": -6.125385096774188
+      "Zonneplan": 69.4962256,
+      "Frank Energie": 19.613770199999994,
+      "ANWB Energie": 2.5753996000000043
     }
   }
 }
