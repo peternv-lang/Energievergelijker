@@ -55,7 +55,8 @@ Werk ze elke 1–2 maanden bij (het rapport en een issue waarschuwen na 60 dagen
 - Alle bedragen incl. btw. Netbeheerkosten en vermindering energiebelasting zijn bij elke leverancier gelijk
   en worden weggelaten.
 - **Dynamisch**: de uurprijs is bij iedereen gelijk, dus het verschil met Tibber is exact
-  `kWh × Δinkoopvergoeding + maanden × Δvaste kosten + teruglevering × Δterugleverkosten`.
+  `kWh × Δinkoopvergoeding + maanden × Δvaste kosten + teruglevering × Δterugleverkosten − zonnebonus`.
+  Tibber-tarieven zijn gecontroleerd tegen de eigen factuur (sep 2026).
 - **Vast**: jouw werkelijke kWh, gesplitst in normaal/dal op basis van je uurverbruik, × het all-in tarief.
   Dit is terugkijkend; toekomstige marktprijzen bepalen of vast dan echt goedkoper is.
 - Minder dan 12 maanden historie wordt lineair opgeschaald naar een jaar.

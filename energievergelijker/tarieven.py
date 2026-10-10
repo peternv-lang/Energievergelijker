@@ -14,6 +14,7 @@ class Dynamisch:
     inkoopvergoeding_per_kwh: float
     vaste_kosten_per_maand: float
     terugleverkosten_per_kwh: float = 0.0
+    zonnebonus_pct: float = 0.0  # bonus over (marktprijs + vergoeding) op teruglevering
     bron: str = ""
 
 

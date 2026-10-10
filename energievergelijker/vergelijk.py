@@ -89,10 +89,14 @@ def _dynamisch(d: Dynamisch, ref: Dynamisch, maanden: list[Periode], t: Tarieven
     basis = sum(m.kosten for m in maanden) - sum(m.opbrengst for m in maanden)
     if t.saldering:
         basis -= min(prod, kwh) * t.energiebelasting_per_kwh
+    # Zonnebonus: % over (marktwaarde teruglevering + vergoeding); marktwaarde volgt uit Tibber.
+    marktwaarde = sum(m.opbrengst for m in maanden)
+    bonus = d.zonnebonus_pct * max(marktwaarde - prod * d.terugleverkosten_per_kwh, 0.0)
     return (
         basis
         + kwh * (d.inkoopvergoeding_per_kwh - ref.inkoopvergoeding_per_kwh)
-        + prod * d.terugleverkosten_per_kwh
+        + prod * (d.terugleverkosten_per_kwh - ref.terugleverkosten_per_kwh)
+        - bonus
         + len(maanden) * d.vaste_kosten_per_maand
     )
 

@@ -19,34 +19,37 @@ naam = "Tibber"
 
 # --------------------------------------------------------------------------
 # Dynamische contracten: stroomprijs = EPEX-uurprijs + inkoopvergoeding.
+# terugleverkosten_per_kwh: wat je per teruggeleverde kWh t.o.v. de kale marktprijs
+# betaalt (positief) of extra krijgt (negatief).
 # De kale uurprijs is bij iedereen gelijk; alleen opslag en vaste kosten verschillen.
 # --------------------------------------------------------------------------
 [[dynamisch]]
 naam = "Tibber"
-inkoopvergoeding_per_kwh = 0.0180
-vaste_kosten_per_maand = 6.99
-terugleverkosten_per_kwh = 0.0248    # Tibber rekent sinds 1-1-2026 kosten bij teruglevering
-bron = "tibber.com/nl/energiecontract (per 1-9-2026)"
+inkoopvergoeding_per_kwh = 0.0248    # factuur sep 2026: 2,05 ct excl. btw
+vaste_kosten_per_maand = 5.99        # factuur sep 2026: € 4,95 excl. btw (nieuwe klanten € 6,99)
+terugleverkosten_per_kwh = 0.0       # inkoopvergoeding-credit en verkoopvergoeding (2,05 ct) heffen elkaar op
+bron = "eigen Tibber-factuur september 2026"
 
 [[dynamisch]]
 naam = "Zonneplan"
 inkoopvergoeding_per_kwh = 0.0200
 vaste_kosten_per_maand = 6.25
-terugleverkosten_per_kwh = -0.0200   # negatief = vergoeding (excl. zonnebonus)
+terugleverkosten_per_kwh = -0.0200   # negatief = vergoeding: marktprijs + € 0,02
+zonnebonus_pct = 0.10                # +10% overdag bij positieve prijs, max 7.500 kWh/jaar
 bron = "stroomvoorspeller.nl, gecheckt 29-9-2026"
 
 [[dynamisch]]
 naam = "Frank Energie"
 inkoopvergoeding_per_kwh = 0.0182
 vaste_kosten_per_maand = 7.00
-terugleverkosten_per_kwh = 0.0182
+terugleverkosten_per_kwh = 0.0       # aanname: kale marktprijs, controleren
 bron = "stroomvoorspeller.nl, gecheckt 29-9-2026"
 
 [[dynamisch]]
 naam = "ANWB Energie"
 inkoopvergoeding_per_kwh = 0.0180
 vaste_kosten_per_maand = 8.50
-terugleverkosten_per_kwh = 0.0180
+terugleverkosten_per_kwh = 0.0       # aanname: kale marktprijs, controleren
 bron = "stroomvoorspeller.nl, gecheckt 29-9-2026"
 
 # --------------------------------------------------------------------------

@@ -97,6 +97,17 @@ class TestVergelijk(unittest.TestCase):
         self.assertIn("Zonnepanelen (SolarEdge)", md)
         self.assertIn("Scenario vanaf 2027", md)
 
+    def test_teruglevering_en_zonnebonus(self):
+        t = tarieven_basis()
+        t.dynamisch.append(Dynamisch("Zon", 0.018, 6.99, terugleverkosten_per_kwh=-0.02, zonnebonus_pct=0.10))
+        d = data(prod=100)
+        for m in d.maanden:
+            m.opbrengst = 10.0  # marktwaarde 100 kWh x € 0,10
+        a = analyseer(d, t, date(2026, 10, 10))
+        zon = next(r for r in a.resultaten if r.naam == "Zon")
+        # per maand: 100 x 0,02 vergoeding + 10% x (10 + 2) bonus = 3,20
+        self.assertAlmostEqual(zon.verschil_jaar, 12 * 3.20, places=6)
+
     def test_solaredge_parse(self):
         p = solaredge.parse({"energy": {"unit": "Wh", "values": [
             {"date": "2026-09-01 00:00:00", "value": 512000.0},
