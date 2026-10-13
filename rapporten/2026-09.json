@@ -3,11 +3,11 @@
   "kwh_maand": 613.733,
   "kosten_maand_tibber": -48.64102896962499,
   "gem_prijs_maand": 0.263364008378725,
-  "gem_marktprijs_maand": 0.3287617324707031,
+  "gem_marktprijs_maand": 0.3227204670022371,
   "kwh_jaar": 7860.3099999999995,
   "teruglevering_jaar": 5505.796,
   "aantal_maanden": 12,
-  "dalfractie": 0.5202727093902731,
+  "dalfractie": 0.5665101220161243,
   "dalfractie_gemeten": true,
   "resultaten": [
     {
@@ -103,25 +103,25 @@
   },
   "melding": true,
   "tarieven_verouderd": false,
-  "tarieven_leeftijd_dagen": 0,
+  "tarieven_leeftijd_dagen": 3,
   "zon": [],
   "scenario_2027": {
     "dagen": 365,
-    "afname_huidig": 7857.441,
-    "terug_huidig": 5526.15,
-    "afname_balans": 4808.147,
-    "terug_balans": 2476.856,
+    "afname_huidig": 7862.912,
+    "terug_huidig": 5552.344,
+    "afname_balans": 4792.859,
+    "terug_balans": 2482.291,
     "voordeel_huidig": {
       "Tibber": 0.0,
-      "Zonneplan": 145.1187168,
-      "Frank Energie": 39.73911059999999,
-      "ANWB Energie": 23.310598800000008
+      "Zonneplan": 145.6688576,
+      "Frank Energie": 39.77521919999999,
+      "ANWB Energie": 23.34780160000001
     },
     "voordeel_balans": {
       "Tibber": 0.0,
-      "Zonneplan": 69.4962256,
-      "Frank Energie": 19.613770199999994,
-      "ANWB Energie": 2.5753996000000043
+      "Zonneplan": 69.53154320000002,
+      "Frank Energie": 19.512869399999996,
+      "ANWB Energie": 2.471441200000008
     }
   }
 }
