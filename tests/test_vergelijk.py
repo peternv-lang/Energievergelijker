@@ -120,6 +120,17 @@ class TestVergelijk(unittest.TestCase):
         self.assertAlmostEqual(sc.voordeel_balans["Goedkoop"], verwacht)
         self.assertIsNone(scenario_2027(dagen, tarieven_basis()))  # geen batterij
 
+    def test_archief_voegt_samen(self):
+        import tempfile
+        from energievergelijker import archief
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = Path(tmp)
+            archief.bewaar(data(maanden=2), map_)
+            archief.bewaar(TibberData("x", [Periode(datetime(2026, 1, 1, tzinfo=TZ), 99.0, 1.0)]), map_)
+            regels = (map_ / "tibber_maanden.csv").read_text().splitlines()
+            self.assertEqual(len(regels), 4)  # kop + 2025-10, 2025-11 + 2026-01
+            self.assertIn("2026-01,99.0", regels[-1])
+
     def test_solaredge_parse(self):
         p = solaredge.parse({"energy": {"unit": "Wh", "values": [
             {"date": "2026-09-01 00:00:00", "value": 512000.0},

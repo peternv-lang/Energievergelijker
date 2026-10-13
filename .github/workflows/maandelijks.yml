@@ -39,7 +39,7 @@ jobs:
         run: |
           git config user.name "energievergelijker-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add rapporten/
+          git add rapporten/ data/
           git diff --cached --quiet || git commit -m "Energierapport ${{ steps.rapport.outputs.titel }}"
           git push
 

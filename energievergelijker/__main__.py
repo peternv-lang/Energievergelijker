@@ -10,7 +10,7 @@ from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 
-from . import rapport, solaredge, tarieven, tibber
+from . import archief, rapport, solaredge, tarieven, tibber
 from .vergelijk import analyseer
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -33,6 +33,7 @@ def main(argv: list[str] | None = None) -> int:
             print("Zet TIBBER_TOKEN (aan te maken via https://developer.tibber.com)", file=sys.stderr)
             return 2
         data = tibber.haal_op(token, args.huis)
+        archief.bewaar(data, ROOT / "data")
 
     opwek = None
     if sleutel := os.environ.get("SOLAREDGE_API_KEY"):
