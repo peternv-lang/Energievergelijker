@@ -105,6 +105,8 @@
   "tarieven_verouderd": false,
   "tarieven_leeftijd_dagen": 3,
   "zon": [],
+  "geschat": false,
+  "ontbrekend": [],
   "scenario_2027": {
     "dagen": 365,
     "afname_huidig": 7862.912,
