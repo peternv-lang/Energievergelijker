@@ -7,6 +7,7 @@ on:
   push:                    # ook draaien na wijziging van code of tarieven
     paths:
       - "config/**"
+      - "data/handmatig.csv"
       - "energievergelijker/**"
       - ".github/workflows/maandelijks.yml"
 
@@ -54,6 +55,25 @@ jobs:
             --title "$TITEL" \
             --body-file "${{ steps.rapport.outputs.rapport }}" \
             --assignee "${{ github.repository_owner }}"
+
+      - name: Herinnering verbruik invoeren
+        if: steps.rapport.outputs.ontbrekend != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITEL: "📝 Verbruik invoeren: ${{ steps.rapport.outputs.ontbrekend }}"
+        run: |
+          gh issue list --state open --limit 100 --json title -q '.[].title' | grep -Fxq "$TITEL" && exit 0
+          gh issue create \
+            --title "$TITEL" \
+            --assignee "${{ github.repository_owner }}" \
+            --body "Voeg per maand één regel toe aan [data/handmatig.csv](${{ github.server_url }}/${{ github.repository }}/edit/${{ github.ref_name }}/data/handmatig.csv) met de cijfers uit de Zonneplan-app (Stroom → maandoverzicht):
+
+          \`\`\`
+          maand,afname_kwh,teruglevering_kwh
+          2026-11,650,120
+          \`\`\`
+
+          Opslaan (commit) start de vergelijking automatisch. Sluit dit issue daarna."
 
       - name: Melding verouderde tarieven
         if: steps.rapport.outputs.verouderd == 'true'

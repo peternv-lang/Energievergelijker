@@ -37,6 +37,7 @@ class Periode:
     kosten: float  # Tibber-energiekosten incl. belasting en btw, excl. vaste kosten
     teruglevering_kwh: float = 0.0
     opbrengst: float = 0.0  # Tibber-vergoeding voor teruglevering
+    geschat: bool = False  # kosten/opbrengst geschat (handmatig ingevoerde kWh, geen Tibber-data)
 
 
 @dataclass

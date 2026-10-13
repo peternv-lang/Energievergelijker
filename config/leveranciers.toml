@@ -14,9 +14,13 @@ drempel_besparing_per_jaar = 50.0    # melding als een alternatief minstens zove
 max_leeftijd_tarieven_dagen = 60
 batterij_kwh = 15.0                  # 3x Sessy 5 kWh; gebruikt voor het scenario na einde saldering
 
-# Jouw huidige contract. Moet een dynamisch contract zijn met naam "Tibber".
+# Jouw contract. Vóór `vanaf` geldt `vorige`. Beide moeten onder [[dynamisch]] staan.
+# `prijsbasis`: de leverancier waarvan de historische kosten komen (Tibber-API/archief).
 [huidig]
-naam = "Tibber"
+naam = "Zonneplan"
+vanaf = 2026-11-01
+vorige = "Tibber"
+prijsbasis = "Tibber"
 
 # --------------------------------------------------------------------------
 # Dynamische contracten: stroomprijs = EPEX-uurprijs + inkoopvergoeding.

@@ -131,6 +131,33 @@ class TestVergelijk(unittest.TestCase):
             self.assertEqual(len(regels), 4)  # kop + 2025-10, 2025-11 + 2026-01
             self.assertIn("2026-01,99.0", regels[-1])
 
+    def test_overstap_en_handmatige_maand(self):
+        import tempfile
+        from energievergelijker import archief, bron
+        from energievergelijker.vergelijk import ontbrekende_maanden
+        t = tarieven_basis(huidig="Goedkoop", huidig_vanaf=date(2026, 11, 1), vorige="Tibber")
+        with tempfile.TemporaryDirectory() as tmp:
+            map_ = Path(tmp)
+            archief.bewaar(data(maanden=12), map_)  # 2025-10 .. 2026-09
+            d = bron.laad_archief(map_)
+            self.assertEqual(len(d.maanden), 12)
+            # oktober nog Tibber
+            self.assertEqual(analyseer(d, t, date(2026, 10, 10)).huidig.naam, "Tibber")
+            # december: november ontbreekt nog
+            self.assertEqual(ontbrekende_maanden(d, date(2026, 12, 3)), ["2026-10", "2026-11"])
+            (map_ / "h.csv").write_text("maand,afname_kwh,teruglevering_kwh\n2026-10,300,0\n2026-11,400,50\n")
+            d = bron.vul_aan(d, map_ / "h.csv")
+            a = analyseer(d, t, date(2026, 12, 3))
+            self.assertEqual(a.maand, date(2026, 11, 1))
+            self.assertEqual(a.huidig.naam, "Goedkoop")
+            self.assertTrue(a.geschat)
+            self.assertEqual(a.ontbrekend, [])
+            self.assertAlmostEqual(d.maanden[-1].kosten, 400 * 0.25)  # prijs uit Tibber-historie
+            tib = next(r for r in a.resultaten if r.naam == "Tibber")
+            # Tibber t.o.v. Goedkoop: 12 maanden x 250 kWh-ish -> Tibber duurder
+            self.assertLess(tib.verschil_jaar, 0)
+            self.assertIn("geschat", rapport.markdown(a))
+
     def test_solaredge_parse(self):
         p = solaredge.parse({"energy": {"unit": "Wh", "values": [
             {"date": "2026-09-01 00:00:00", "value": 512000.0},

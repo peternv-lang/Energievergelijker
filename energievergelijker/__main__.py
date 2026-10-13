@@ -10,7 +10,7 @@ from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 
-from . import archief, rapport, solaredge, tarieven, tibber
+from . import archief, bron, rapport, solaredge, tarieven, tibber
 from .vergelijk import analyseer
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -28,12 +28,19 @@ def main(argv: list[str] | None = None) -> int:
     if args.demo:
         data = tibber.parse(json.loads(args.demo.read_text()))
     else:
-        token = os.environ.get("TIBBER_TOKEN")
-        if not token:
-            print("Zet TIBBER_TOKEN (aan te maken via https://developer.tibber.com)", file=sys.stderr)
-            return 2
-        data = tibber.haal_op(token, args.huis)
-        archief.bewaar(data, ROOT / "data")
+        data = None
+        if token := os.environ.get("TIBBER_TOKEN"):
+            try:
+                data = tibber.haal_op(token, args.huis)
+                archief.bewaar(data, ROOT / "data")
+            except Exception as fout:  # na opzeggen Tibber: verder met archief
+                print(f"Tibber niet beschikbaar, archief gebruikt: {fout}", file=sys.stderr)
+        archief_data = bron.laad_archief(ROOT / "data")
+        if data is None:
+            data = archief_data
+        elif not data.dagen:
+            data.dagen = archief_data.dagen
+        data = bron.vul_aan(data, ROOT / "data" / "handmatig.csv")
 
     opwek = None
     if sleutel := os.environ.get("SOLAREDGE_API_KEY"):
@@ -56,6 +63,7 @@ def main(argv: list[str] | None = None) -> int:
             f.write(f"verouderd={'true' if a.tarieven_verouderd else 'false'}\n")
             f.write(f"rapport={args.uit / (naam + '.md')}\n")
             f.write(f"titel={rapport.kop(a)} ({rapport.maandnaam(a)})\n")
+            f.write(f"ontbrekend={' '.join(a.ontbrekend)}\n")
     return 0
 
 

@@ -39,15 +39,23 @@ class Tarieven:
     max_leeftijd_tarieven_dagen: int
     huidig: str
     batterij_kwh: float = 0.0
+    huidig_vanaf: date | None = None
+    vorige: str | None = None
+    prijsbasis: str = "Tibber"  # leverancier waarvan de (historische) kosten/prijzen komen
     dynamisch: list[Dynamisch] = field(default_factory=list)
     vast: list[Vast] = field(default_factory=list)
 
-    @property
-    def huidig_contract(self) -> Dynamisch:
+    def contract(self, naam: str) -> Dynamisch:
         for d in self.dynamisch:
-            if d.naam == self.huidig:
+            if d.naam == naam:
                 return d
-        raise ValueError(f"Huidig contract '{self.huidig}' staat niet onder [[dynamisch]]")
+        raise ValueError(f"Contract '{naam}' staat niet onder [[dynamisch]]")
+
+    def huidig_op(self, maand: date) -> str:
+        """Leverancier die in `maand` leverde (rekening houdend met een overstap)."""
+        if self.huidig_vanaf and self.vorige and maand < self.huidig_vanaf:
+            return self.vorige
+        return self.huidig
 
 
 def laad(pad: Path) -> Tarieven:
@@ -62,6 +70,9 @@ def laad(pad: Path) -> Tarieven:
         max_leeftijd_tarieven_dagen=alg.get("max_leeftijd_tarieven_dagen", 60),
         huidig=cfg["huidig"]["naam"],
         batterij_kwh=alg.get("batterij_kwh", 0.0),
+        huidig_vanaf=cfg["huidig"].get("vanaf"),
+        vorige=cfg["huidig"].get("vorige"),
+        prijsbasis=cfg["huidig"].get("prijsbasis", "Tibber"),
         dynamisch=[Dynamisch(**d) for d in cfg.get("dynamisch", [])],
         vast=[Vast(**v) for v in cfg.get("vast", [])],
     )

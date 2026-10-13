@@ -39,6 +39,16 @@ def markdown(a: Analyse) -> str:
             f"de afgelopen {a.aantal_maanden} maanden circa **{euro(a.beste.verschil_jaar)} per jaar** "
             f"({euro(a.beste.verschil_jaar / 12)} per maand) op.\n"
         )
+    if a.ontbrekend:
+        r.append(
+            f"> 📝 Nog geen verbruik ingevoerd voor {', '.join(a.ontbrekend)}. Vul `data/handmatig.csv` aan; "
+            "dit rapport gaat over de laatste maand met data.\n"
+        )
+    if a.geschat:
+        r.append(
+            "> Kosten zijn geschat met de prijzen van dezelfde maand vorig jaar. De verschillen tussen "
+            "dynamische leveranciers hangen alleen af van je kWh en zijn exact.\n"
+        )
     if a.tarieven_verouderd:
         r.append(
             f"> ⚠️ De leverancierstarieven zijn {a.tarieven_leeftijd_dagen} dagen oud. "
@@ -48,7 +58,10 @@ def markdown(a: Analyse) -> str:
     r.append(f"## Jouw verbruik — {maandnaam(a)}\n")
     r.append("| | |\n|---|---|")
     r.append(f"| Verbruik | {a.kwh_maand:,.0f} kWh |".replace(",", "."))
-    r.append(f"| Kosten Tibber (energie + vaste kosten) | {euro(a.kosten_maand_tibber)} |")
+    r.append(
+        f"| Kosten {a.huidig.naam} (energie + vaste kosten) | {euro(a.kosten_maand_tibber)}"
+        f"{' (geschat)' if a.geschat else ''} |"
+    )
     if a.gem_prijs_maand is not None:
         r.append(f"| Jouw gemiddelde prijs | {euro(a.gem_prijs_maand)}/kWh |")
     if a.gem_marktprijs_maand is not None:

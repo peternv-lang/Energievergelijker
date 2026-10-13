@@ -39,6 +39,17 @@ PYTHONPATH=.:tests python -m unittest discover -s tests
 
 Geen externe packages nodig (Python ≥ 3.11).
 
+## Na de overstap naar Zonneplan (vanaf november 2026)
+
+- Tibber-historie staat in `data/tibber_maanden.csv` en `data/tibber_dagen.csv` en blijft bruikbaar
+  als de Tibber-API na opzeggen niets meer levert.
+- Nieuwe maanden: voeg een regel toe aan `data/handmatig.csv` (`maand,afname_kwh,teruglevering_kwh`)
+  met de cijfers uit de Zonneplan-app. Ontbreekt een maand, dan maakt de workflow op de 3e een
+  herinneringsissue met een directe bewerklink. Opslaan start de vergelijking automatisch.
+- Kosten van handmatige maanden worden geschat met de prijzen van dezelfde maand vorig jaar; de
+  verschillen tussen dynamische leveranciers zijn exact (die hangen alleen af van kWh).
+- In `config/leveranciers.toml` bepaalt `[huidig]` welk contract wanneer gold (`vanaf`/`vorige`).
+
 ## Tarieven bijhouden
 
 Er bestaat geen openbare API met leverancierstarieven; die staan in `config/leveranciers.toml`.

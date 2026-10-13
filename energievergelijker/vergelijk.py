@@ -51,6 +51,8 @@ class Analyse:
     tarieven_verouderd: bool
     tarieven_leeftijd_dagen: int
     zon: list[ZonMaand] = field(default_factory=list)
+    geschat: bool = False  # kosten van de rapportmaand zijn geschat
+    ontbrekend: list[str] = field(default_factory=list)  # maanden zonder verbruiksdata
     scenario_2027: Scenario2027 | None = None
 
 
@@ -140,7 +142,7 @@ def _voordeel(d: Dynamisch, ref: Dynamisch, afname: float, terug: float) -> floa
     )
 
 
-def scenario_2027(dagen: list[Dag], t: Tarieven) -> Scenario2027 | None:
+def scenario_2027(dagen: list[Dag], t: Tarieven, huidig: str | None = None) -> Scenario2027 | None:
     if len(dagen) < 28 or not t.batterij_kwh:
         return None
     schaal = 365 / len(dagen)
@@ -149,7 +151,7 @@ def scenario_2027(dagen: list[Dag], t: Tarieven) -> Scenario2027 | None:
     netto = [d.afname - d.teruglevering for d in dagen]
     afname_b = sum(max(n, 0.0) for n in netto) * schaal
     terug_b = sum(max(-n, 0.0) for n in netto) * schaal
-    ref = t.huidig_contract
+    ref = t.contract(huidig or t.huidig)
     return Scenario2027(
         dagen=len(dagen),
         afname_huidig=afname,
@@ -159,6 +161,21 @@ def scenario_2027(dagen: list[Dag], t: Tarieven) -> Scenario2027 | None:
         voordeel_huidig={d.naam: _voordeel(d, ref, afname, terug) for d in t.dynamisch},
         voordeel_balans={d.naam: _voordeel(d, ref, afname_b, terug_b) for d in t.dynamisch},
     )
+
+
+def ontbrekende_maanden(data: TibberData, vandaag: date) -> list[str]:
+    """Volledige maanden sinds de laatste bekende maand t/m vorige maand zonder data."""
+    if not data.maanden:
+        return []
+    laatste = max(m.start.date() for m in data.maanden).replace(day=1)
+    eind = date(vandaag.year, vandaag.month, 1)
+    uit = []
+    j, mnd = laatste.year, laatste.month
+    while True:
+        j, mnd = (j + 1, 1) if mnd == 12 else (j, mnd + 1)
+        if date(j, mnd, 1) >= eind:
+            return uit
+        uit.append(f"{j}-{mnd:02d}")
 
 
 def analyseer(
@@ -176,7 +193,8 @@ def analyseer(
     dal, gemeten = dalfractie(uren_maand or data.uren)
 
     schaal = 12 / len(volledig)
-    ref = t.huidig_contract
+    ref = t.contract(t.prijsbasis)
+    huidig_naam = t.huidig_op(maand)
     resultaten = [
         Resultaat(
             naam=d.naam,
@@ -184,7 +202,7 @@ def analyseer(
             kosten_maand=_dynamisch(d, ref, [laatste], t),
             kosten_jaar=_dynamisch(d, ref, volledig, t) * schaal,
             bron=d.bron,
-            huidig=d.naam == t.huidig,
+            huidig=d.naam == huidig_naam,
         )
         for d in t.dynamisch
     ] + [
@@ -205,7 +223,7 @@ def analyseer(
     resultaten.sort(key=lambda r: r.kosten_jaar)
     beste = resultaten[0]
 
-    gem_prijs = laatste.kosten / laatste.kwh if laatste.kwh else None
+    gem_prijs = laatste.kosten / laatste.kwh if laatste.kwh and not laatste.geschat else None
     prijzen = [u.prijs for u in uren_maand if u.prijs]
     leeftijd = (vandaag - t.peildatum).days
 
@@ -227,8 +245,12 @@ def analyseer(
         tarieven_verouderd=leeftijd > t.max_leeftijd_tarieven_dagen,
         tarieven_leeftijd_dagen=leeftijd,
         scenario_2027=scenario_2027(
-            sorted({d.datum: d for d in data.dagen if d.datum < vandaag}.values(), key=lambda d: d.datum)[-365:], t
+            sorted({d.datum: d for d in data.dagen if d.datum < vandaag}.values(), key=lambda d: d.datum)[-365:],
+            t,
+            huidig_naam,
         ),
+        geschat=laatste.geschat,
+        ontbrekend=ontbrekende_maanden(data, vandaag),
         zon=[
             ZonMaand(
                 maand=f"{m.start:%Y-%m}",
