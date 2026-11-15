@@ -1,0 +1,129 @@
+{
+  "maand": "2026-10-01",
+  "kwh_maand": 716.0,
+  "kosten_maand_tibber": 91.70195798284205,
+  "gem_prijs_maand": null,
+  "gem_marktprijs_maand": null,
+  "kwh_jaar": 7925.978,
+  "teruglevering_jaar": 5574.422,
+  "aantal_maanden": 12,
+  "dalfractie": 0.45,
+  "dalfractie_gemeten": false,
+  "resultaten": [
+    {
+      "naam": "Zonneplan",
+      "soort": "dynamisch",
+      "kosten_maand": 73.78011626551884,
+      "kosten_jaar": 362.16093786551863,
+      "verschil_jaar": 294.6110201173232,
+      "welkomstbonus": 0.0,
+      "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
+      "huidig": false
+    },
+    {
+      "naam": "Frank Energie",
+      "soort": "dynamisch",
+      "kosten_maand": 87.98635798284205,
+      "kosten_jaar": 616.5805031828419,
+      "verschil_jaar": 40.191454799999974,
+      "welkomstbonus": 0.0,
+      "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
+      "huidig": false
+    },
+    {
+      "naam": "ANWB Energie",
+      "soort": "dynamisch",
+      "kosten_maand": 89.34315798284206,
+      "kosten_jaar": 632.9953075828419,
+      "verschil_jaar": 23.776650399999994,
+      "welkomstbonus": 0.0,
+      "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
+      "huidig": false
+    },
+    {
+      "naam": "Tibber",
+      "soort": "dynamisch",
+      "kosten_maand": 91.70195798284205,
+      "kosten_jaar": 656.7719579828419,
+      "verschil_jaar": 0.0,
+      "welkomstbonus": 0.0,
+      "bron": "eigen Tibber-factuur september 2026",
+      "huidig": true
+    },
+    {
+      "naam": "Budget Thuis 1 jaar vast",
+      "soort": "vast",
+      "kosten_maand": 135.788,
+      "kosten_jaar": 804.8730240000002,
+      "verschil_jaar": -148.10106601715836,
+      "welkomstbonus": 0.0,
+      "bron": "keuze.nl / overstappen.nl, oktober 2026 \u2014 vaste kosten controleren",
+      "huidig": false
+    },
+    {
+      "naam": "Eneco 1 jaar vast",
+      "soort": "vast",
+      "kosten_maand": 140.23434,
+      "kosten_jaar": 832.5422593200002,
+      "verschil_jaar": -175.77030133715834,
+      "welkomstbonus": 0.0,
+      "bron": "keuze.nl, oktober 2026 \u2014 vaste kosten controleren",
+      "huidig": false
+    },
+    {
+      "naam": "Essent 1 jaar vast",
+      "soort": "vast",
+      "kosten_maand": 142.99,
+      "kosten_jaar": 847.8979200000002,
+      "verschil_jaar": -191.12596201715837,
+      "welkomstbonus": 0.0,
+      "bron": "energievergelijk.nl, oktober 2026 \u2014 vaste kosten controleren",
+      "huidig": false
+    }
+  ],
+  "beste": {
+    "naam": "Zonneplan",
+    "soort": "dynamisch",
+    "kosten_maand": 73.78011626551884,
+    "kosten_jaar": 362.16093786551863,
+    "verschil_jaar": 294.6110201173232,
+    "welkomstbonus": 0.0,
+    "bron": "stroomvoorspeller.nl, gecheckt 29-9-2026",
+    "huidig": false
+  },
+  "huidig": {
+    "naam": "Tibber",
+    "soort": "dynamisch",
+    "kosten_maand": 91.70195798284205,
+    "kosten_jaar": 656.7719579828419,
+    "verschil_jaar": 0.0,
+    "welkomstbonus": 0.0,
+    "bron": "eigen Tibber-factuur september 2026",
+    "huidig": true
+  },
+  "melding": true,
+  "tarieven_verouderd": false,
+  "tarieven_leeftijd_dagen": 36,
+  "zon": [],
+  "geschat": true,
+  "ontbrekend": [],
+  "scenario_2027": {
+    "dagen": 365,
+    "afname_huidig": 7862.912,
+    "terug_huidig": 5552.344,
+    "afname_balans": 4792.859,
+    "terug_balans": 2482.291,
+    "voordeel_huidig": {
+      "Tibber": 0.0,
+      "Zonneplan": 145.6688576,
+      "Frank Energie": 39.77521919999999,
+      "ANWB Energie": 23.34780160000001
+    },
+    "voordeel_balans": {
+      "Tibber": 0.0,
+      "Zonneplan": 69.53154320000002,
+      "Frank Energie": 19.512869399999996,
+      "ANWB Energie": 2.471441200000008
+    }
+  }
+}
