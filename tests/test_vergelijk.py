@@ -158,6 +158,20 @@ class TestVergelijk(unittest.TestCase):
             self.assertLess(tib.verschil_jaar, 0)
             self.assertIn("geschat", rapport.markdown(a))
 
+    def test_handmatig_zonder_kopregel(self):
+        import tempfile
+        from energievergelijker import bron
+        with tempfile.TemporaryDirectory() as tmp:
+            pad = Path(tmp) / "h.csv"
+            pad.write_text("2026-10,716,294\n\n2026-11, 650 ,\n")
+            self.assertEqual(
+                bron._lees_handmatig(pad),
+                [
+                    {"maand": "2026-10", "afname_kwh": "716", "teruglevering_kwh": "294"},
+                    {"maand": "2026-11", "afname_kwh": "650", "teruglevering_kwh": "0"},
+                ],
+            )
+
     def test_solaredge_parse(self):
         p = solaredge.parse({"energy": {"unit": "Wh", "values": [
             {"date": "2026-09-01 00:00:00", "value": 512000.0},

@@ -107,9 +107,8 @@ def dalfractie(uren: list[Uur]) -> tuple[float, bool]:
 def _dynamisch(d: Dynamisch, ref: Dynamisch, maanden: list[Periode], t: Tarieven) -> float:
     kwh = sum(m.kwh for m in maanden)
     prod = sum(m.teruglevering_kwh for m in maanden)
+    # Tibber's opbrengst bevat al de gesaldeerde energiebelasting (factuur sep 2026).
     basis = sum(m.kosten for m in maanden) - sum(m.opbrengst for m in maanden)
-    if t.saldering:
-        basis -= min(prod, kwh) * t.energiebelasting_per_kwh
     # Zonnebonus: % over (marktwaarde teruglevering + vergoeding); marktwaarde volgt uit Tibber.
     marktwaarde = sum(m.opbrengst for m in maanden)
     bonus = d.zonnebonus_pct * max(marktwaarde - prod * d.terugleverkosten_per_kwh, 0.0)

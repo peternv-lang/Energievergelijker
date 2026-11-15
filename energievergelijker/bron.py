@@ -21,6 +21,26 @@ def _lees(pad: Path) -> list[dict]:
         return [r for r in csv.DictReader(f) if any((v or "").strip() for v in r.values())]
 
 
+def _lees_handmatig(pad: Path) -> list[dict]:
+    """Leest maand,afname,teruglevering op positie; kopregel en lege regels zijn optioneel."""
+    if not pad.exists():
+        return []
+    rijen = []
+    with open(pad, newline="") as f:
+        for cellen in csv.reader(f):
+            cellen = [c.strip() for c in cellen]
+            if not cellen or not cellen[0] or not cellen[0][:4].isdigit():
+                continue  # lege regel of kopregel
+            rijen.append(
+                {
+                    "maand": cellen[0][:7],
+                    "afname_kwh": cellen[1],
+                    "teruglevering_kwh": cellen[2] if len(cellen) > 2 and cellen[2] else "0",
+                }
+            )
+    return rijen
+
+
 def _maandstart(maand: str) -> datetime:
     j, m = maand.split("-")
     return datetime(int(j), int(m), 1, tzinfo=timezone.utc)
@@ -60,8 +80,8 @@ def _prijzen(maanden: list[Periode], kalendermaand: int) -> tuple[float, float]:
 def vul_aan(data: TibberData, handmatig: Path) -> TibberData:
     """Voegt handmatig ingevoerde maanden toe die niet (of leeg) in de Tibber-data zitten."""
     bekend = {f"{m.start:%Y-%m}" for m in data.maanden if m.kwh > 0}
-    for r in _lees(handmatig):
-        maand = r["maand"].strip()
+    for r in _lees_handmatig(handmatig):
+        maand = r["maand"]
         if maand in bekend:
             continue
         start = _maandstart(maand)
